@@ -13,6 +13,6 @@ fn main() {
     // image.get_pixel_mut(5, 5).data = [255, 255, 255];
     image.get_pixel_mut(5, 5).0 = [255, 255, 255];
 
-    // write it out to a file
-    image.save("output.png").unwrap();
+    fs::create_dir_all("out").unwrap();
+    image.save("out/output.png").unwrap();
 }
