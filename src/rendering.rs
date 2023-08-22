@@ -6,7 +6,7 @@ pub struct CameraConfig {
     center: Point3,
     // assuming direction = <0, 1, 0>
     // TODO: parameterize yaw, pitch, roll
-    fov_w: f64,
+    fov_h: f64,
     resolution_v: u32,
     resolution_h: u32,
 }
@@ -15,7 +15,7 @@ impl Default for CameraConfig {
     fn default() -> Self {
         CameraConfig {
             center: ORIGIN3,
-            fov_w: 103_f64.to_radians(),
+            fov_h: 103_f64.to_radians(),
             resolution_v: 360,
             resolution_h: 480,
         }
