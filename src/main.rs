@@ -1,20 +1,16 @@
 extern crate image;
 
-use std::fs;
-use image::{Rgb, RgbImage};
+mod rendering;
+mod surface;
+mod space3d;
 
-const WIDTH: u32 = 256;
-const HEIGHT: u32 = 256;
+use std::fs;
+use surface::VOID_SURFACE;
 
 fn main() {
-    let mut image = RgbImage::new(WIDTH, HEIGHT);
 
-    for x in 0u8..=255 {
-        for y in 0u8..=255 {
-            image.put_pixel(x.into(), y.into(), Rgb([0, x, y]));
-        }
-    }
-
+    let image = rendering::render(Default::default(), VOID_SURFACE);
+    
     fs::create_dir_all("out").unwrap();
     image.save("out/output.png").unwrap();
 }
