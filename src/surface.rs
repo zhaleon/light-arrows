@@ -1,13 +1,13 @@
 use glam::DVec3;
-use crate::ray::Ray;
+use crate::ray::{Ray, HitInfo};
 
 pub trait Surface {
-    fn intersect(self, ray: Ray) -> Option<DVec3>;
+    fn intersect(self, ray: Ray) -> Option<HitInfo>;
 }
 
 pub struct VoidSurface { }
 impl Surface for VoidSurface {
-    fn intersect (self, _: Ray) -> Option<DVec3> { None }
+    fn intersect (self, _: Ray) -> Option<HitInfo> { None }
 }
 
 pub const VOID_SURFACE: VoidSurface = VoidSurface { };
@@ -18,7 +18,7 @@ pub struct Sphere {
     pub radius: f64,
 }
 impl Surface for &Sphere {
-    fn intersect (self, ray: Ray) -> Option<DVec3> {
+    fn intersect (self, ray: Ray) -> Option<HitInfo> {
         // intersect the line t*p with the sphere centered at (c - o)
         let p = ray.direction;
         let o = ray.origin;
@@ -31,11 +31,17 @@ impl Surface for &Sphere {
         let t1 = (- DVec3::dot(p, o - c) - delta.sqrt()) / p.length_squared();
         let t2 = (- DVec3::dot(p, o - c) + delta.sqrt()) / p.length_squared();
         if t1 < 0.0 && t2 < 0.0 {
-            None
-        } else if t1 < 0.0 {
-            Some(ray.origin + t2 * ray.direction)
+            return None
         } else {
-            Some(ray.origin + t1 * ray.direction)
+            let contact_point = if t1 < 0.0 {
+                ray.origin + t2 * ray.direction
+            } else {
+                ray.origin + t1 * ray.direction
+            };
+            Some(HitInfo{
+                contact_point,
+                direction: contact_point - self.center,
+            })
         }
     }
 }

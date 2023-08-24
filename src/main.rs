@@ -10,7 +10,7 @@ use surface::Sphere;
 
 fn main() {
     let sphere = Sphere {
-        center: DVec3{ x: 2.0, y: 5.0, z: 3.0 },
+        center: DVec3{ x: 3.0, y: 5.0, z: 3.0 },
         radius: 1.0
     };
     let image = rendering::render(Default::default(), sphere);

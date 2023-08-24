@@ -53,14 +53,17 @@ pub fn rays_of(camera: Camera) -> impl Iterator<Item=(u32, u32, Ray)> {
 pub fn render(camera: Camera, sphere: Sphere) -> RgbImage {
     let mut image = RgbImage::new(camera.resolution_h, camera.resolution_v);
     for (row, col, ray) in rays_of(camera) {
+        let intersect_info = sphere.intersect(ray);
         let pixel = Rgb(
-            if sphere.intersect(ray).is_some() {
-                [255, 255, 255]
-            } else {
-                [0, 0, 0]
+            match intersect_info {
+                Some(intersect_info) => {
+                    [(intersect_info.direction.normalize().dot(DVec3::NEG_Z) * 256.0).floor() as u8; 3]
+                },
+                None => [200, 255, 255],
             }
         );
         image.put_pixel(row, col, pixel);
     }
+        image.put_pixel(20, 10, Rgb([0; 3]));
     image
 }
