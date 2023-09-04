@@ -1,5 +1,6 @@
 use glam::DVec3;
-use crate::ray::{Ray, HitInfo};
+use image::Rgb;
+use crate::{ray::{Ray, HitInfo}, material::Material};
 
 pub trait Surface {
     fn intersect(self, ray: Ray) -> Option<HitInfo>;
@@ -12,12 +13,13 @@ impl Surface for VoidSurface {
 
 pub const VOID_SURFACE: VoidSurface = VoidSurface { };
 
-
+#[derive(Copy, Clone, Debug)]
 pub struct Sphere {
     pub center: DVec3,
     pub radius: f64,
+    pub material: Material,
 }
-impl Surface for &Sphere {
+impl Surface for Sphere {
     fn intersect (self, ray: Ray) -> Option<HitInfo> {
         // intersect the line t*p with the sphere centered at (c - o)
         let p = ray.direction;
@@ -33,20 +35,25 @@ impl Surface for &Sphere {
         if t1 < 0.0 && t2 < 0.0 {
             return None
         } else {
-            let contact_point = if t1 < 0.0 {
-                ray.origin + t2 * ray.direction
-            } else {
-                ray.origin + t1 * ray.direction
-            };
+            let contact_time = if t1 < 0.0 { t2 } else { t1 };
+            let contact_point = ray.origin + contact_time * ray.direction;
             Some(HitInfo{
+                contact_time,
                 contact_point,
-                direction: contact_point - self.center,
+                contact_normal: contact_point - self.center,
+                material: self.material.color,
             })
         }
     }
 }
 
-pub const UNIT_SPHERE: Sphere = Sphere { center: DVec3::ZERO, radius: 1.0 };
+pub const UNIT_SPHERE: Sphere = Sphere {
+    center: DVec3::ZERO,
+    radius: 1.0,
+    material: Material{
+        color: Rgb([255, 255, 255])
+    },
+};
 
 /*
 pub struct Triangle {

@@ -1,6 +1,6 @@
 use glam::DVec3;
 use image::{RgbImage, Rgb};
-use crate::{surface::{Sphere, Surface}, ray::Ray};
+use crate::{surface::{Sphere, Surface}, ray::{Ray, HitInfo}, sky::sky_color_in_direction};
 
 pub struct Camera {
     center: DVec3,
@@ -27,7 +27,6 @@ impl Default for Camera {
 pub fn rays_of(camera: Camera) -> impl Iterator<Item=(u32, u32, Ray)> {
     let height = camera.resolution_h as f64;
     let width  = camera.resolution_v as f64;
-    let d = camera.viewport_distance;
     let tan_theta = (camera.fov_h / 2.0).tan();
 
     (0..camera.resolution_h).flat_map( move |row| {
@@ -37,11 +36,11 @@ pub fn rays_of(camera: Camera) -> impl Iterator<Item=(u32, u32, Ray)> {
                 col,
                 Ray {
                     origin: camera.center,
-                    direction: d * DVec3 {
+                    direction: DVec3 {
                         x: - tan_theta
                             + (2 * col + 1) as f64 * tan_theta / width,
-                        y: d,
-                        z: d * height / width * tan_theta
+                        y: 1.0,
+                        z: height / width * tan_theta
                             - (2 * row + 1) as f64 * tan_theta / width,
                     }.normalize_or_zero(),
                 }
@@ -50,20 +49,28 @@ pub fn rays_of(camera: Camera) -> impl Iterator<Item=(u32, u32, Ray)> {
     })
 }
 
-pub fn render(camera: Camera, sphere: Sphere) -> RgbImage {
+// returns the first sphere hit
+fn hit(ray: Ray, spheres: &Vec<Sphere>) -> Option<HitInfo> {
+    spheres
+        .iter()
+        .filter_map(|sphere| sphere.intersect(ray))
+        .min_by(|hit1, hit2| {
+            (&hit1.contact_time)
+                .partial_cmp(&hit2.contact_time)
+                .unwrap() // TODO: skull
+        })
+}
+
+pub fn render(camera: Camera, spheres: Vec<Sphere>) -> RgbImage {
     let mut image = RgbImage::new(camera.resolution_h, camera.resolution_v);
     for (row, col, ray) in rays_of(camera) {
-        let intersect_info = sphere.intersect(ray);
-        let pixel = Rgb(
-            match intersect_info {
-                Some(intersect_info) => {
-                    [(intersect_info.direction.normalize().dot(DVec3::NEG_Z) * 256.0).floor() as u8; 3]
-                },
-                None => [200, 255, 255],
-            }
-        );
+        let intersect_info = hit(ray, &spheres);
+        let pixel = match intersect_info {
+            Some(intersect_info) => intersect_info.material,
+            // Some(intersect_info) => sky_color_in_direction(intersect_info.contact_normal),
+            None => sky_color_in_direction(ray.direction),
+        };
         image.put_pixel(row, col, pixel);
     }
-        image.put_pixel(20, 10, Rgb([0; 3]));
     image
 }
