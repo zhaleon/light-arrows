@@ -1,5 +1,4 @@
 use glam::DVec3;
-use image::Rgb;
 use crate::{ray::{Ray, HitInfo}, material::Material};
 
 pub trait Surface {
@@ -41,7 +40,7 @@ impl Surface for Sphere {
                 contact_time,
                 contact_point,
                 contact_normal: contact_point - self.center,
-                material: self.material.color,
+                material: self.material.specular_color,
             })
         }
     }
@@ -51,7 +50,7 @@ pub const UNIT_SPHERE: Sphere = Sphere {
     center: DVec3::ZERO,
     radius: 1.0,
     material: Material{
-        color: Rgb([255, 255, 255])
+        specular_color: DVec3::from_array([1.0, 1.0, 1.0])
     },
 };
 

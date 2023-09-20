@@ -19,55 +19,55 @@ fn main() {
         Sphere {
             center: fake_origin,
             radius: 0.33,
-            material: Material { color: Rgb([255, 255, 255]) },
+            material: Material { specular_color: DVec3::new(1.0, 1.0, 1.0) },
         },
 
         Sphere {
             center: fake_origin + DVec3::X,
             radius: 0.33,
-            material: Material { color: Rgb([255, 0, 0]) },
+            material: Material { specular_color: DVec3::new(1.0, 0.0, 0.0) },
         },
         Sphere {
             center: fake_origin + 2.0 * DVec3::X,
             radius: 0.33,
-            material: Material { color: Rgb([255, 0, 0]) },
+            material: Material { specular_color: DVec3::new(1.0, 0.0, 0.0) },
         },
         Sphere {
             center: fake_origin + 3.0 * DVec3::X,
             radius: 0.33,
-            material: Material { color: Rgb([255, 0, 0]) },
+            material: Material { specular_color: DVec3::new(1.0, 0.0, 0.0) },
         },
 
         Sphere {
             center: fake_origin + DVec3::Y,
             radius: 0.33,
-            material: Material { color: Rgb([0, 100, 0]) },
+            material: Material { specular_color: DVec3::new(0.0, 1.0, 0.0) },
         },
         Sphere {
             center: fake_origin + 2.0 * DVec3::Y,
             radius: 0.33,
-            material: Material { color: Rgb([0, 200, 0]) },
+            material: Material { specular_color: DVec3::new(0.0, 1.0, 0.0) },
         },
         Sphere {
             center: fake_origin + 3.0 * DVec3::Y,
             radius: 0.33,
-            material: Material { color: Rgb([0, 255, 0]) },
+            material: Material { specular_color: DVec3::new(0.0, 1.0, 0.0) },
         },
 
         Sphere {
             center: fake_origin + DVec3::Z,
             radius: 0.33,
-            material: Material { color: Rgb([0, 0, 255]) },
+            material: Material { specular_color: DVec3::new(0.0, 0.0, 1.0) },
         },
         Sphere {
             center: fake_origin + 2.0 * DVec3::Z,
             radius: 0.33,
-            material: Material { color: Rgb([0, 0, 255]) },
+            material: Material { specular_color: DVec3::new(0.0, 0.0, 1.0) },
         },
         Sphere {
             center: fake_origin + 3.0 * DVec3::Z,
             radius: 0.33,
-            material: Material { color: Rgb([0, 0, 255]) },
+            material: Material { specular_color: DVec3::new(0.0, 0.0, 1.0) },
         },
     );
 

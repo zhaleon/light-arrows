@@ -1,6 +1,6 @@
 use glam::DVec3;
 use image::{RgbImage, Rgb};
-use crate::{surface::{Sphere, Surface}, ray::{Ray, HitInfo}, sky::sky_color_in_direction};
+use crate::{surface::{Sphere, Surface}, ray::{Ray, HitInfo}, sky::sky_light_in_direction};
 
 pub struct Camera {
     center: DVec3,
@@ -18,8 +18,10 @@ impl Default for Camera {
             center: DVec3::ZERO,
             fov_h: 103_f64.to_radians(),
             viewport_distance: 1.0,
-            resolution_v: 360,
-            resolution_h: 480,
+            // resolution_v: 360,
+            // resolution_h: 480,
+            resolution_v: 720,
+            resolution_h: 960,
         }
     }
 }
@@ -51,6 +53,7 @@ pub fn rays_of(camera: Camera) -> impl Iterator<Item=(u32, u32, Ray)> {
 
 // returns the first sphere hit
 fn hit(ray: Ray, spheres: &Vec<Sphere>) -> Option<HitInfo> {
+    // (contact point, contact normal)
     spheres
         .iter()
         .filter_map(|sphere| sphere.intersect(ray))
@@ -61,16 +64,42 @@ fn hit(ray: Ray, spheres: &Vec<Sphere>) -> Option<HitInfo> {
         })
 }
 
-pub fn render(camera: Camera, spheres: Vec<Sphere>) -> RgbImage {
+// fn hit_sequence(ray: Ray
+
+// fn shoot_ray(ray: Ray, spheres: &Vec<Sphere>) -> Option<HitInfo> {
+//     for bounce in 0..BOUNCE_LIMIT {
+
+//     }
+//     hit(ray, &spheres)
+// }
+
+fn light_to_color(light: DVec3) -> Rgb<u8> {
+    let r = (255.0 * light.x) as u8;
+    let g = (255.0 * light.y) as u8;
+    let b = (255.0 * light.z) as u8;
+    let color = Rgb([r, g, b]);
+    return color;
+}
+
+pub fn render(camera: Camera, objects: Vec<Sphere>) -> RgbImage {
     let mut image = RgbImage::new(camera.resolution_h, camera.resolution_v);
     for (row, col, ray) in rays_of(camera) {
-        let intersect_info = hit(ray, &spheres);
+        let intersect_info = hit(ray, &objects);
+
         let pixel = match intersect_info {
-            Some(intersect_info) => intersect_info.material,
-            // Some(intersect_info) => sky_color_in_direction(intersect_info.contact_normal),
-            None => sky_color_in_direction(ray.direction),
+            Some(intersect_info) => {
+                // let specular_direction = ray.direction.project_onto(intersect_info.contact_normal) 
+                    // - ray.direction.reject_from(intersect_info.contact_normal);
+
+                let specular_direction = ray.direction - 2.0 * (ray.direction.dot(intersect_info.contact_normal)) * intersect_info.contact_normal;
+
+                intersect_info.material * sky_light_in_direction(specular_direction)
+            },
+
+            None => sky_light_in_direction(ray.direction),
         };
-        image.put_pixel(row, col, pixel);
+
+        image.put_pixel(row, col, light_to_color(pixel));
     }
     image
 }
