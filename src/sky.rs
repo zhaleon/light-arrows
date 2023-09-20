@@ -2,8 +2,8 @@ use glam::DVec3;
 use image::Rgb;
 
 pub fn sky_color_in_direction(dir: DVec3) -> Rgb<u8> {
-    if dir.x > 0.0 {
-        return Rgb([0, 0, 0])
+    if dir.z < 0.0 {
+        return Rgb([120, 170, 100])
     }
 
     let sun_direction = DVec3::new(-1.0, 1.0, 1.0).normalize();

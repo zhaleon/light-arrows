@@ -29,11 +29,11 @@ pub fn rays_of(camera: Camera) -> impl Iterator<Item=(u32, u32, Ray)> {
     let width  = camera.resolution_v as f64;
     let tan_theta = (camera.fov_h / 2.0).tan();
 
-    (0..camera.resolution_h).flat_map( move |row| {
-        (0..camera.resolution_v).map( move |col| {
+    (0..camera.resolution_v).flat_map( move |row| {
+        (0..camera.resolution_h).map( move |col| {
             (
-                row,
                 col,
+                row,
                 Ray {
                     origin: camera.center,
                     direction: DVec3 {
